@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
 
+def load_image(im_path):
+    try:
+        return cv2.imdecode(np.fromfile(im_path, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+    except cv2.error:
+        return None
+
 def _laplacian(img):
     return cv2.Laplacian(img, cv2.CV_64F)
 
@@ -26,11 +32,12 @@ def detect_white_noise(image, threshold=10, lap = None):
     noisy_pixels = np.sum(abs_laplacian < threshold)
     total_pixels = image.size
     noise_percentage = (noisy_pixels / total_pixels)
-    return noise_percentage
+    return 1 - noise_percentage
 
 def run(img):
     if isinstance(img, str):
-        img = cv2.imread(img)
+        #img = cv2.imread(img)
+        img = load_image(img)
     if img is None:
         return 0,0,0
     lap = _laplacian(img)
